@@ -32,7 +32,7 @@ const service = ({ strapi }: { strapi: Core.Strapi }) => ({
       const transformedData = transformData(data);
       return transformedData.text;
     } catch (error) {
-      return { error: 'Error fetching transcript', data: null };
+      return { error: 'Error fetching transcript: ' + error, data: null };
     }
 
   },
