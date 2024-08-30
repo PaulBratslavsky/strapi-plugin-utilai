@@ -1,6 +1,6 @@
 {
   "name": "utilai",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Utils for common AI use cases",
   "keywords": [],
   "license": "MIT",
@@ -35,7 +35,7 @@
     "watch:link": "strapi-plugin watch:link"
   },
   "dependencies": {
-    "youtube-transcript": "^1.2.1"
+    "youtubei.js": "^10.4.0"
   },
   "devDependencies": {
     "@strapi/sdk-plugin": "^5.1.0",

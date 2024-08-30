@@ -1,22 +1,31 @@
 import type { Core } from '@strapi/strapi';
-import { YoutubeTranscript } from 'youtube-transcript';
+import { Innertube } from "youtubei.js/web";
 
-function transformData(data: any) {
-  let text = '';
-
-  data.forEach((item: any) => {
-    text += item.text + ' ';
+const fetchTranscript = async (
+  url: string
+): Promise<(string | undefined)[] | undefined> => {
+  const youtube = await Innertube.create({
+    lang: "en",
+    location: "US",
+    retrieve_player: false,
   });
 
-  return {
-    data: data,
-    text: text.trim(),
-  };
-}
+  try {
+    const info = await youtube.getInfo(url);
+    const transcriptData = await info.getTranscript();
+    return transcriptData?.transcript?.content?.body?.initial_segments.map(
+      (segment) => segment.snippet.text
+    );
+  } catch (error) {
+    console.error("Error fetching transcript:", error);
+    throw error;
+  }
+};
 
-async function getTranscript(id: string) {
-  const response = await YoutubeTranscript.fetchTranscript(id);
-  return response;
+  async function getYouTubeTranscript(videoUrl: string) {
+  const videoId = new URL(videoUrl).searchParams.get("v");
+  const transcript = await fetchTranscript(videoId);
+  return transcript?.join(" ");
 }
 
 const service = ({ strapi }: { strapi: Core.Strapi }) => ({
@@ -28,9 +37,14 @@ const service = ({ strapi }: { strapi: Core.Strapi }) => ({
     if (!isValid) return { error: 'Invalid video ID', data: null };
 
     try {
-      const data = await getTranscript(videoId);
-      const transformedData = transformData(data);
-      return transformedData.text;
+      const baseUrl = 'https://www.youtube.com';
+      const path = '/watch';
+      const url = new URL(path, baseUrl);
+      url.searchParams.set('v', videoId);
+
+      const transcript = await getYouTubeTranscript(url.href);
+      return transcript;
+
     } catch (error) {
       return { error: 'Error fetching transcript: ' + error, data: null };
     }
