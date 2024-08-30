@@ -1,9 +1,10 @@
 import type { Core } from '@strapi/strapi';
-import { Innertube } from "youtubei.js/web";
 
 const fetchTranscript = async (
   url: string
 ): Promise<(string | undefined)[] | undefined> => {
+  const { Innertube } = await import("youtubei.js");
+
   const youtube = await Innertube.create({
     lang: "en",
     location: "US",
